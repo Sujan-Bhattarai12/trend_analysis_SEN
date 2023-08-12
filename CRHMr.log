@@ -1,0 +1,4 @@
+2023-08-12_14:01:41 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/R_codes/precipitation_phase/Langtang_WFDEI_teauQsiQlip_1979_2018.obs datetype:discrete timezone:MST 
+2023-08-12_14:01:56 changeEAtoRH dataframe: trhup 
+2023-08-12_14:02:08 phaseCorrect dataframe:trhup 
+2023-08-12_14:03:28 writeObsFile dataframe:trhup.phase .obs file: C:/Users/sujan/OneDrive/Desktop/R_codes/precipitation_phase/rainsnow_1979_2016.obs 
