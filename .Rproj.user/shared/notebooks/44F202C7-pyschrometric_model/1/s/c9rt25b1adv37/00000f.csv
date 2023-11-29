@@ -1,0 +1,6 @@
+"0","#create slope values for sen's slope"
+"0","mkmodel_temp     <- mblm(temp_ema ~ year, data=moving_average)"
+"0","mkmodel_wind     <- mblm(wind_ema ~ year, data=moving_average)"
+"0","mkmodel_rh       <- mblm(rh_ema ~ year, data=moving_average)"
+"0","mkmodel_precip   <- mblm(precip_ema ~ year, data=moving_average)"
+"0","mkmodel_smoother <- mblm(smooth_precip ~ year, data=moving_average)"

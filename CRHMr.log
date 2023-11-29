@@ -2,3 +2,16 @@
 2023-08-12_14:01:56 changeEAtoRH dataframe: trhup 
 2023-08-12_14:02:08 phaseCorrect dataframe:trhup 
 2023-08-12_14:03:28 writeObsFile dataframe:trhup.phase .obs file: C:/Users/sujan/OneDrive/Desktop/R_codes/precipitation_phase/rainsnow_1979_2016.obs 
+2023-09-06_11:41:48 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/R_codes/precipitation_phase/Langtang_WFDEI_teauQsiQlip_1979_2018.obs datetype:discrete timezone:MST 
+2023-09-06_11:41:58 changeEAtoRH dataframe: trhup 
+2023-09-06_11:42:11 phaseCorrect dataframe:trhup 
+2023-09-06_11:42:18 writeObsFile dataframe:trhup.phase .obs file: C:/Users/sujan/OneDrive/Desktop/R_codes/precipitation_phase/rainsnow_1979_2016.obs 
+2023-11-28_19:00:18 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/PhaseResearch/calculate-rainfall-ratio/data/rainsnow_1979_2016.obs datetype:discrete timezone:MST 
+2023-11-28_19:03:13 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/PhaseResearch/calculate-rainfall-ratio/data/rainsnow_1979_2016.obs datetype:discrete timezone:UTC 
+2023-11-28_19:08:25 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/PhaseResearch/calculate-rainfall-ratio/data/rainsnow_1979_2016.obs datetype:discrete timezone:UTC 
+2023-11-28_19:10:46 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/PhaseResearch/calculate-rainfall-ratio/data/rainsnow_1979_2016.obs datetype:discrete timezone:MST 
+2023-11-28_19:12:56 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/PhaseResearch/calculate-rainfall-ratio/data/climate_data.obs datetype:discrete timezone:MST 
+2023-11-28_19:13:25 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/PhaseResearch/calculate-rainfall-ratio/data/climate_data.obs datetype:discrete timezone:MST 
+2023-11-28_19:13:49 changeEAtoRH dataframe: climate_data 
+2023-11-28_19:14:45 phaseCorrect dataframe:trhup 
+2023-11-28_19:15:25 phaseCorrect dataframe:trhup 

@@ -1,0 +1,5 @@
+#major script
+
+#Run all files from this code
+source("pyschrometric_model.qmd")
+source("part2.qmd")
