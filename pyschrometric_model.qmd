@@ -29,6 +29,12 @@ library(pracma)
 library(car)
 library(gridExtra)
 library(xts)
+library(here)
+```
+
+```{r}
+#set the path for plots so that all plots are saved inside `plots` folder
+plot_path = file.path(here('plots'))
 ```
 
 ```{r}
@@ -49,7 +55,7 @@ climate_data     <- subset(climate_data, select = c(datetime, t.1, rh.1, u.1, p.
 
 ```{r}
 #phaseCorrect function partitions based on the temp
-climate_partitioned <- phaseCorrect(trhup, Tcol = 1, RHcol = 2, Ucol = 3, Pcol = 4,
+climate_partitioned <- phaseCorrect(climate_data, Tcol = 1, RHcol = 2, Ucol = 3, Pcol = 4,
                             shield = 0, quiet = F) 
 ```
 
@@ -129,7 +135,8 @@ pettitt.test(moving_average$rain_ratio_ema)
 
 
 ```{r}
-#create slope values for sen's slope
+#create slope values for sen's slopem 
+# this value will be used in next plot
 mkmodel_temp     <- mblm(temp_ema ~ year, data=moving_average)
 mkmodel_wind     <- mblm(wind_ema ~ year, data=moving_average)
 mkmodel_rh       <- mblm(rh_ema ~ year, data=moving_average)
@@ -138,7 +145,8 @@ mkmodel_smoother <- mblm(smooth_precip ~ year, data=moving_average)
 ```
 
 ```{r}
-###legend
+###legend color, manual color setup, often this can be used upon
+  #multiples graphs
 colors <- c("variable_color"= "blue", "weight_color"="lightblue", 'abline_color'= 'red')
 
 #prepare graphs
@@ -170,7 +178,7 @@ make_graph <- function(type, variable, weight, xlab, ylab, mkmodel, legend.posit
 
 
 ```{r}
-png("trend_test.tiff", height = 5, width = 7, units = "in", res = 300)
+png("plots/trend_test.tiff",  height = 5, width = 7, units = "in", res = 300)
 grid.arrange(make_graph( type = geom_line, variable= temp,    weight = temp_ema,   xlab="", ylab = "Temperature °C",  mkmodel= mkmodel_temp),
              make_graph( type = geom_line, variable= wind,    weight = wind_ema,   xlab="", ylab = expression("Wind (ms"^-1*")"), mkmodel= mkmodel_wind),
              make_graph( type = geom_step, variable= rh,     weight = rh_ema,     xlab="", ylab =  "Relative Humidity (%)", mkmodel= mkmodel_rh),
@@ -203,7 +211,7 @@ calculate_mk_test(moving_average)
 # the code below this point test the same thing for annual daytime and nighttime
 # filtering data only for days(6am and 6pm) requred in model fitting in next step
 
-annual_Day <- data %>% 
+annual_Day <- climate_cleaned %>% 
   group_by(year) %>%
   filter( period=="Day") %>% 
   summarize(rain_ratio= mean(phaseCorrectRainRatio)) %>% 
@@ -219,7 +227,7 @@ param.est(x)
 
 ```{r}
 #### for night period
-annual_Night <- data %>% 
+annual_Night <- climate_cleaned %>% 
   group_by(year) %>%
   filter( period=="Night" ) %>% 
   summarize(rain_ratio= mean(phaseCorrectRainRatio)) %>% 
@@ -231,14 +239,17 @@ sens.slope(annual_Night$night_rain_ratio_ema)
 pettitt.test(annual_Night$night_rain_ratio_ema)
 x <- cpt.meanvar(annual_Night$night_rain_ratio_ema, method="AMOC", minseglen = 10)# identifies changepoint
 param.est(x)
+```
 
+
+```{r}
 # ggplot does not have readymade function for sens slope.. so manual model is created for day and night
 # so that it can be used in visualization part
 mkmodel1 <- mblm(day_rain_ratio_ema ~ year, data=annual_Day) #for day 
 mkmodel2 <- mblm(night_rain_ratio_ema ~ year, data=annual_Night) #for night
 
 # this data is required for plotting for day and night averages
-annual_mean <- data %>%
+annual_mean <- climate_cleaned %>%
   group_by(year, period) %>%
   filter(p.1 != 0 ) %>%
   summarize(annual_average= mean(phaseCorrectRainRatio))
@@ -262,14 +273,17 @@ ggplot(annual_mean, aes(year, annual_average, color= period))+
   scale_color_manual(values = c('col1' = '#0072B2', 'col2' = '#E69F00'))
 
 
-ggsave("day-and-night.tiff", height=5, width=4) # saves the previously created ggplot graphics in high quality
+ggsave("plots/day-and-night.tiff", height=5, width=4) # saves the previously created ggplot graphics in high quality
+```
 
+
+```{r}
 # for august and for all other months
 #caluculating rainfall ratio trend for aug
 # for other months, need to change month value to different one
 
 monthwise_test <- function(x, y) {
-  filtered_data <- data %>% 
+  filtered_data <- climate_cleaned %>% 
     filter(month == x &  period==y) %>% 
     group_by(year, month, period) %>% 
     summarize(mean = mean(phaseCorrectRainRatio)) %>% 
@@ -309,9 +323,12 @@ monthwise_test("Dec", "Night")
 # logistic regression for temperature boundary point
 # phase is estimated based on rain ratio.. with greater than 0.5 as 1, and less than 0.5 as 0
 #then creating phase column as factor, which is enforced to logistic model
+```
 
+
+```{r}
 #### data for logistic maping
-summary_log <- data %>% 
+summary_log <- climate_cleaned %>% 
   group_by(year, month, day) %>% 
   summarize(temp= mean(t.1), 
             rh= mean(rh.1),
@@ -338,8 +355,11 @@ ggplot(summary_log, aes(temp, rain_ratio))+
   theme(axis.title = element_text(size = 14))+ xlab("Temperature °C")+ ylab("Logistic probability")+
   theme(legend.text=element_text(size= 12))
 
-ggsave("logistic.png", width = 7, height= 7, type="cairo", dpi= 300)
+ggsave("plots/logistic.png", width = 7, height= 7, type="cairo", dpi= 300)
+```
 
+
+```{r}
 ## visual representation of rain-ratio with rall variables
 visual_relation <- function(variable){
   summary_log %>% 
@@ -354,7 +374,10 @@ visual_relation(rh)
 visual_relation(wind)
 visual_relation(temp)
 visual_relation(pp)
+```
 
+
+```{r}
 # creating graph for sample year 2000
 
 datetime <- seq(
@@ -362,7 +385,7 @@ datetime <- seq(
   to = as.Date("2018/12/31"),
   by = "days")
 
-data <- trhup.phase %>% 
+data <- clone_copy %>% 
   mutate(phaseCorrectRainRatio= round(phaseCorrectRainRatio, digits=2),
          year= year(datetime),
          month= month(datetime, label = TRUE),
@@ -371,111 +394,119 @@ data <- trhup.phase %>%
          season = ifelse( month <= "Feb"  | month == "Dec", "winter",
                           ifelse( month == "Mar" | month == "Apr" | month == "May", "pre_monsoon",
                                   ifelse(month == "Oct" | month == "Nov", "post_monsoon", "monsoon")))) %>% 
-  filter(year != 2019)
+filter(year != 2019)
+```
 
-time_series <- data %>% 
-  group_by(year, month, day) %>% 
-  summarize(rain=sum(phaseCorrectRain), snow= sum(phaseCorrectSnow), temp= mean(t.1))
 
-ts2 <- xts(time_series[4:5], order.by = datetime)
-ts2_2000 <- ts2["2000"]
+```{r}
+# time_series <- data %>% 
+#                 group_by(year, month, day) %>% 
+#                 summarize(rain=sum(phaseCorrectRain), snow= sum(phaseCorrectSnow), temp= mean(t.1))
+# 
+# ts2 <- xts(time_series[4:5], order.by = datetime)
+# ts2_2000 <- ts2["2000"]
+# 
+# dev.new()
+# png( "plots/rain and snow.tiff", height = 4, width = 10, units = "in", res = 300)
+# plot( ts2$rain, lwd = 0.5, xlim=c(1979, 2018), col = "#454545", main = NA,
+#       yaxis.right = F, ylab = "Precipitation(mm/day)", grid.col=NA, cex=0.7)
+# lines(ts2$snow, col = 4, lwd = 0.5)
+# addLegend(legend.loc = "topright", legend.names = c("rainfall", "snowfall"), col = c("#454545", 4),
+#           lty = 1, lwd = 1.5)
+# 
+# axis(side = 4, at = pretty(ts2_2000$phaseCorrectSnow.sum), col = 4, lwd = 1.6)
+# dev.off()
+```
 
-dev.new()
-png( "rain and snow.tiff", height = 4, width = 10, units = "in", res = 300)
-plot( ts2$rain, lwd = 0.5, xlim=c(1979, 2018), col = "#454545", main = NA,
-      yaxis.right = F, ylab = "Precipitation(mm/day)", grid.col=NA, cex=0.7)
-lines(ts2$snow, col = 4, lwd = 0.5)
-addLegend(legend.loc = "topright", legend.names = c("rainfall", "snowfall"), col = c("#454545", 4),
-          lty = 1, lwd = 1.5)
 
-axis(side = 4, at = pretty(ts2_2000$phaseCorrectSnow.sum), col = 4, lwd = 1.6)
-dev.off()
-
+```{r}
 ############## plot for the sample year
-
-dev.new()
-png("rain and snow 2000.tiff", height = 4, width = 10, units = "in", res = 300)
-
-plot(ts2_2000$rain, lwd = 1, xlim(1979, 2018), col = "#454545",
-     main = NA, yaxis.right = F, ylab = "Precipitation(mm/day)", cex=0.7,
-     grid.col=NA)
-lines(ts2_2000$snow, col = 4,lwd = 1)
-addLegend(
-  legend.loc = "topright",
-  legend.names = c("rainfall", "snowfall"),
-  col = c("#454545", 4),
-  lty = 1,
-  lwd = 1.5)
-dev.off()
-
-# month_wise grid plot with 40 lines
-lines_graph_maker <- function(calculate, column, ylabel, legend){
-  monthly_data <- data %>%  
-    group_by(year, month) %>% 
-    summarize(mean = calculate({{column}}))
-  
-  monthly_data$year <- factor(monthly_data$year)
-  color_palette <- colorRampPalette(c("#0165fc", "yellow", "red"))(length(unique(monthly_data$year)))
-  
-  ggplot(monthly_data, aes(month, mean, group = year, color = year)) +
-    geom_line(size = ifelse(between(as.integer(monthly_data$year), 1, 1) |
-                              between(as.integer(monthly_data$year), 40, 40), 0.7, 0.2),
-              alpha = 1) + 
-    scale_color_manual(values = color_palette) +
-    # geom_line(data = monthly_data[1, ], aes(group = year, color = year), size = 2) +
-    # geom_line(data = monthly_data[length(monthly_data$year), ], aes(group = year, color = year), size = 2) +
-    theme_bw() +
-    theme(axis.title = element_text(size = 10)) +
-    ylab(ylabel) +
-    xlab("") +
-    theme(legend.position = legend, legend.text = element_text(size = 12))
-}
-
-plot1  <- lines_graph_maker(max,  t.1,  "Maximum Daily Temperature °C", legend="none")
-plot2  <- lines_graph_maker(min,  t.1,  "Minimum Daily Temperature °C", legend="none")
-plot3  <- lines_graph_maker(mean, rh.1,  "Relative Humidity (%)", legend="none")
-plot4  <- lines_graph_maker(mean, u.1,  expression("Wind (ms"^-1*")"), legend="none")
-plot5  <- lines_graph_maker(sum,  p.1,  "Precipitation (mm)", legend="none")
-
-png("4plots_combined.tiff", height = 8, width = 8, units = "in", res = 300)
-grid.arrange(plot1, plot2, plot3, plot4, plot5)
-dev.off()
-
-png("oneplotwithlegend.tiff", height = 7, width = 7, units = "in", res = 300)
-lines_graph_maker(sum,  p.1,  "Precipitation (m/s)", legend="right")
-dev.off()
+# dev.new()
+# png("plots/rain and snow 2000.tiff", height = 4, width = 10, units = "in", res = 300)
+# 
+# plot(ts2_2000$rain, lwd = 1, xlim(1979, 2018), col = "#454545",
+#      main = NA, yaxis.right = F, ylab = "Precipitation(mm/day)", cex=0.7,
+#      grid.col=NA)
+# lines(ts2_2000$snow, col = 4,lwd = 1)
+# addLegend(
+#   legend.loc = "topright",
+#   legend.names = c("rainfall", "snowfall"),
+#   col = c("#454545", 4),
+#   lty = 1,
+#   lwd = 1.5)
+# dev.off()
+```
 
 
-####seasonal mathematical measure 
-
-seasonal <- function(x, y) {
-  filtered_data <- clone_copy  %>% 
-    filter(season == x &  period==y) %>% 
-    group_by(year, season, period) %>% 
-    summarize(mean = mean(phaseCorrectRainRatio)) %>% 
-    ungroup() %>% 
-    mutate(mean_ema = movavg(mean, n=5, type='e')) 
-  return(list(filtered_data, mk.test(filtered_data$mean_ema), sens.slope(filtered_data$mean_ema),
-              pettitt.test(filtered_data$mean_ema), cpt.meanvar(filtered_data$mean_ema, method="AMOC", minseglen = 10)))
-}
-
-seasonal("monsoon", "Day")
-seasonal("monsoon", "Night")
-seasonal('pre_monsoon', "Day")
-seasonal('pre_monsoon', "Night")
-seasonal('post_monsoon', "Day")
-seasonal('post_monsoon', "Night")
-seasonal('winter', "Day")
-seasonal('winter', "Night")
-
-######rain to snow precipitation ration
-volume <- data %>%
-  group_by(year) %>% 
-  summarize(rain = mean(phaseCorrectRain),
-            snow = mean(phaseCorrectSnow)) %>% 
-  mutate(ratio=rain/snow) %>% 
-  summarize(mean = mean(ratio),
-            lower_ci = quantile(ratio, probs = 0.025),
-            upper_ci = quantile(ratio, probs = 0.975))
+```{r}
+# # month_wise grid plot with 40 lines
+# lines_graph_maker <- function(calculate, column, ylabel, legend){
+#   monthly_data <- data %>%  
+#     group_by(year, month) %>% 
+#     summarize(mean = calculate({{column}}))
+#   
+#   monthly_data$year <- factor(monthly_data$year)
+#   color_palette <- colorRampPalette(c("#0165fc", "yellow", "red"))(length(unique(monthly_data$year)))
+#   
+#   ggplot(monthly_data, aes(month, mean, group = year, color = year)) +
+#     geom_line(size = ifelse(between(as.integer(monthly_data$year), 1, 1) |
+#                               between(as.integer(monthly_data$year), 40, 40), 0.7, 0.2),
+#               alpha = 1) + 
+#     scale_color_manual(values = color_palette) +
+#     # geom_line(data = monthly_data[1, ], aes(group = year, color = year), size = 2) +
+#     # geom_line(data = monthly_data[length(monthly_data$year), ], aes(group = year, color = year), size = 2) +
+#     theme_bw() +
+#     theme(axis.title = element_text(size = 10)) +
+#     ylab(ylabel) +
+#     xlab("") +
+#     theme(legend.position = legend, legend.text = element_text(size = 12))
+# }
+# 
+# plot1  <- lines_graph_maker(max,  t.1,  "Maximum Daily Temperature °C", legend="none")
+# plot2  <- lines_graph_maker(min,  t.1,  "Minimum Daily Temperature °C", legend="none")
+# plot3  <- lines_graph_maker(mean, rh.1,  "Relative Humidity (%)", legend="none")
+# plot4  <- lines_graph_maker(mean, u.1,  expression("Wind (ms"^-1*")"), legend="none")
+# plot5  <- lines_graph_maker(sum,  p.1,  "Precipitation (mm)", legend="none")
+# 
+# png("plots/4plots_combined.tiff", height = 8, width = 8, units = "in", res = 300)
+# grid.arrange(plot1, plot2, plot3, plot4, plot5)
+# dev.off()
+# 
+# png("plots/oneplotwithlegend.tiff", height = 7, width = 7, units = "in", res = 300)
+# lines_graph_maker(sum,  p.1,  "Precipitation (m/s)", legend="right")
+# dev.off()
+# 
+# 
+# ####seasonal mathematical measure 
+# 
+# seasonal <- function(x, y) {
+#   filtered_data <- clone_copy  %>% 
+#     filter(season == x &  period==y) %>% 
+#     group_by(year, season, period) %>% 
+#     summarize(mean = mean(phaseCorrectRainRatio)) %>% 
+#     ungroup() %>% 
+#     mutate(mean_ema = movavg(mean, n=5, type='e')) 
+#   return(list(filtered_data, mk.test(filtered_data$mean_ema), sens.slope(filtered_data$mean_ema),
+#               pettitt.test(filtered_data$mean_ema), cpt.meanvar(filtered_data$mean_ema, method="AMOC", minseglen = 10)))
+# }
+# 
+# seasonal("monsoon", "Day")
+# seasonal("monsoon", "Night")
+# seasonal('pre_monsoon', "Day")
+# seasonal('pre_monsoon', "Night")
+# seasonal('post_monsoon', "Day")
+# seasonal('post_monsoon', "Night")
+# seasonal('winter', "Day")
+# seasonal('winter', "Night")
+# 
+# ######rain to snow precipitation ration
+# volume <- data %>%
+#   group_by(year) %>% 
+#   summarize(rain = mean(phaseCorrectRain),
+#             snow = mean(phaseCorrectSnow)) %>% 
+#   mutate(ratio=rain/snow) %>% 
+#   summarize(mean = mean(ratio),
+#             lower_ci = quantile(ratio, probs = 0.025),
+#             upper_ci = quantile(ratio, probs = 0.975))
 
 ```

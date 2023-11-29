@@ -1,2 +1,0 @@
-"0","plot( ts2$rain, lwd = 0.5, xlim=c(1979, 2018), col = ""#454545"", main = NA,"
-"0","      yaxis.right = F, ylab = ""Precipitation(mm/day)"", grid.col=NA, cex=0.7)"

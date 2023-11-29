@@ -1,6 +1,0 @@
-"0","addLegend("
-"0","  legend.loc = ""topright"","
-"0","  legend.names = c(""rainfall"", ""snowfall""),"
-"0","  col = c(""#454545"", 4),"
-"0","  lty = 1,"
-"0","  lwd = 1.5)"

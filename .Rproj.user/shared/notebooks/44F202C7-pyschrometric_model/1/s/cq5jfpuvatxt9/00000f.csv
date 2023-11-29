@@ -1,5 +1,0 @@
-"0","png(""trend_test.tiff"", height = 5, width = 7, units = ""in"", res = 300)"
-"0","grid.arrange(make_graph( type = geom_line, variable= temp,    weight = temp_ema,   xlab="""", ylab = ""Temperature °C"",  mkmodel= mkmodel_temp),"
-"0","             make_graph( type = geom_line, variable= wind,    weight = wind_ema,   xlab="""", ylab = expression(""Wind (ms""^-1*"")""), mkmodel= mkmodel_wind),"
-"0","             make_graph( type = geom_step, variable= rh,     weight = rh_ema,     xlab="""", ylab =  ""Relative Humidity (%)"", mkmodel= mkmodel_rh),"
-"0","             make_graph( type = geom_bar,  variable =smooth_precip, weight = precip_ema, xlab="""", ylab = expression(""Precipitation (mm)""), mkmodel=mkmodel_smoother))"
