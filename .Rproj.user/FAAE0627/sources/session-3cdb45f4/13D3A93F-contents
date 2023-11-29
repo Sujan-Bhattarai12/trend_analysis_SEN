@@ -32,6 +32,11 @@ library(xts)
 ```
 
 ```{r}
+#set the path for plots so that all plots are saved inside `plots` folder
+plot_path = file.path(here('plots'))
+```
+
+```{r}
 #constuct file path using here package
 climate_data <- here("data", "climate_data.obs")
 climate_data <- readObsFile(climate_data, timezone = 'MST', quiet = F)
@@ -170,7 +175,7 @@ make_graph <- function(type, variable, weight, xlab, ylab, mkmodel, legend.posit
 
 
 ```{r}
-png("trend_test.tiff", height = 5, width = 7, units = "in", res = 300)
+png("plots/trend_test.tiff",  height = 5, width = 7, units = "in", res = 300)
 grid.arrange(make_graph( type = geom_line, variable= temp,    weight = temp_ema,   xlab="", ylab = "Temperature °C",  mkmodel= mkmodel_temp),
              make_graph( type = geom_line, variable= wind,    weight = wind_ema,   xlab="", ylab = expression("Wind (ms"^-1*")"), mkmodel= mkmodel_wind),
              make_graph( type = geom_step, variable= rh,     weight = rh_ema,     xlab="", ylab =  "Relative Humidity (%)", mkmodel= mkmodel_rh),
@@ -203,7 +208,7 @@ calculate_mk_test(moving_average)
 # the code below this point test the same thing for annual daytime and nighttime
 # filtering data only for days(6am and 6pm) requred in model fitting in next step
 
-annual_Day <- data %>% 
+annual_Day <- climate_cleaned %>% 
   group_by(year) %>%
   filter( period=="Day") %>% 
   summarize(rain_ratio= mean(phaseCorrectRainRatio)) %>% 
@@ -219,7 +224,7 @@ param.est(x)
 
 ```{r}
 #### for night period
-annual_Night <- data %>% 
+annual_Night <- climate_cleaned %>% 
   group_by(year) %>%
   filter( period=="Night" ) %>% 
   summarize(rain_ratio= mean(phaseCorrectRainRatio)) %>% 
@@ -238,7 +243,7 @@ mkmodel1 <- mblm(day_rain_ratio_ema ~ year, data=annual_Day) #for day
 mkmodel2 <- mblm(night_rain_ratio_ema ~ year, data=annual_Night) #for night
 
 # this data is required for plotting for day and night averages
-annual_mean <- data %>%
+annual_mean <- climate_cleaned %>%
   group_by(year, period) %>%
   filter(p.1 != 0 ) %>%
   summarize(annual_average= mean(phaseCorrectRainRatio))
@@ -262,14 +267,14 @@ ggplot(annual_mean, aes(year, annual_average, color= period))+
   scale_color_manual(values = c('col1' = '#0072B2', 'col2' = '#E69F00'))
 
 
-ggsave("day-and-night.tiff", height=5, width=4) # saves the previously created ggplot graphics in high quality
+ggsave("plots/day-and-night.tiff", height=5, width=4) # saves the previously created ggplot graphics in high quality
 
 # for august and for all other months
 #caluculating rainfall ratio trend for aug
 # for other months, need to change month value to different one
 
 monthwise_test <- function(x, y) {
-  filtered_data <- data %>% 
+  filtered_data <- climate_cleaned %>% 
     filter(month == x &  period==y) %>% 
     group_by(year, month, period) %>% 
     summarize(mean = mean(phaseCorrectRainRatio)) %>% 
@@ -311,7 +316,7 @@ monthwise_test("Dec", "Night")
 #then creating phase column as factor, which is enforced to logistic model
 
 #### data for logistic maping
-summary_log <- data %>% 
+summary_log <- climate_cleaned %>% 
   group_by(year, month, day) %>% 
   summarize(temp= mean(t.1), 
             rh= mean(rh.1),
@@ -338,7 +343,7 @@ ggplot(summary_log, aes(temp, rain_ratio))+
   theme(axis.title = element_text(size = 14))+ xlab("Temperature °C")+ ylab("Logistic probability")+
   theme(legend.text=element_text(size= 12))
 
-ggsave("logistic.png", width = 7, height= 7, type="cairo", dpi= 300)
+ggsave("plots/logistic.png", width = 7, height= 7, type="cairo", dpi= 300)
 
 ## visual representation of rain-ratio with rall variables
 visual_relation <- function(variable){
@@ -381,7 +386,7 @@ ts2 <- xts(time_series[4:5], order.by = datetime)
 ts2_2000 <- ts2["2000"]
 
 dev.new()
-png( "rain and snow.tiff", height = 4, width = 10, units = "in", res = 300)
+png( "plots/rain and snow.tiff", height = 4, width = 10, units = "in", res = 300)
 plot( ts2$rain, lwd = 0.5, xlim=c(1979, 2018), col = "#454545", main = NA,
       yaxis.right = F, ylab = "Precipitation(mm/day)", grid.col=NA, cex=0.7)
 lines(ts2$snow, col = 4, lwd = 0.5)
@@ -394,7 +399,7 @@ dev.off()
 ############## plot for the sample year
 
 dev.new()
-png("rain and snow 2000.tiff", height = 4, width = 10, units = "in", res = 300)
+png("plots/rain and snow 2000.tiff", height = 4, width = 10, units = "in", res = 300)
 
 plot(ts2_2000$rain, lwd = 1, xlim(1979, 2018), col = "#454545",
      main = NA, yaxis.right = F, ylab = "Precipitation(mm/day)", cex=0.7,
@@ -437,11 +442,11 @@ plot3  <- lines_graph_maker(mean, rh.1,  "Relative Humidity (%)", legend="none")
 plot4  <- lines_graph_maker(mean, u.1,  expression("Wind (ms"^-1*")"), legend="none")
 plot5  <- lines_graph_maker(sum,  p.1,  "Precipitation (mm)", legend="none")
 
-png("4plots_combined.tiff", height = 8, width = 8, units = "in", res = 300)
+png("plots/4plots_combined.tiff", height = 8, width = 8, units = "in", res = 300)
 grid.arrange(plot1, plot2, plot3, plot4, plot5)
 dev.off()
 
-png("oneplotwithlegend.tiff", height = 7, width = 7, units = "in", res = 300)
+png("plots/oneplotwithlegend.tiff", height = 7, width = 7, units = "in", res = 300)
 lines_graph_maker(sum,  p.1,  "Precipitation (m/s)", legend="right")
 dev.off()
 

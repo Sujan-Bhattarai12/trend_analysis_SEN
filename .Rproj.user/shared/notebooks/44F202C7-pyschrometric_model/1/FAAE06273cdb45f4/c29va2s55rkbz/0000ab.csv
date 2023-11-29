@@ -1,0 +1,4 @@
+"0",""
+"0","plot(ts2_2000$rain, lwd = 1, xlim(1979, 2018), col = ""#454545"","
+"0","     main = NA, yaxis.right = F, ylab = ""Precipitation(mm/day)"", cex=0.7,"
+"0","     grid.col=NA)"

@@ -1,0 +1,1 @@
+"0","ggsave(""plots/day-and-night.tiff"", height=5, width=4) # saves the previously created ggplot graphics in high quality"
