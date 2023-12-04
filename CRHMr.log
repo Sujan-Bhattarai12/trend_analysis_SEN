@@ -12,3 +12,6 @@
 2023-11-29_11:24:57 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/PhaseResearch/calculate-rainfall-ratio/data/climate_data.obs datetype:discrete timezone:MST 
 2023-11-29_11:25:10 changeEAtoRH dataframe: climate_data 
 2023-11-29_11:25:25 phaseCorrect dataframe:climate_data 
+2023-12-04_14:49:33 readObsFile obsFile:C:/Users/sujan/OneDrive/Desktop/PhaseResearch/calculate-rainfall-ratio/data/climate_data.obs datetype:discrete timezone:MST 
+2023-12-04_14:49:42 changeEAtoRH dataframe: climate_data 
+2023-12-04_14:49:54 phaseCorrect dataframe:climate_data 

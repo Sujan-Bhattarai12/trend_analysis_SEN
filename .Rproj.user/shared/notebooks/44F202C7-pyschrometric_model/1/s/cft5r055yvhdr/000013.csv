@@ -1,7 +1,0 @@
-"0","#multiply wind variable for air speed at height of 5m from the ground"
-"0","climate_data$u.1 <- climate_data$u.1 * 5"
-"0",""
-"0","#Obs_Data is specific to CRHM package, so the the code below automatically chose"
-"0","## Ea to change to Relative humidity, and select onlly the required columns"
-"0","climate_data     <- changeEatoRH(climate_data)"
-"0","climate_data     <- subset(climate_data, select = c(datetime, t.1, rh.1, u.1, p.1))"

@@ -1,3 +1,0 @@
-"0","#constuct file path using here package"
-"0","climate_data <- here(""data"", ""climate_data.obs"")"
-"0","climate_data <- readObsFile(climate_data, timezone = 'MST', quiet = F)"

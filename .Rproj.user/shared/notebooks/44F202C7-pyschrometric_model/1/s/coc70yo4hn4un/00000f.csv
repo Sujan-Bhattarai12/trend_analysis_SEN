@@ -1,4 +1,5 @@
-"0","###legend"
+"0","###legend color, manual color setup, often this can be used upon"
+"0","  #multiples graphs"
 "0","colors <- c(""variable_color""= ""blue"", ""weight_color""=""lightblue"", 'abline_color'= 'red')"
 "0",""
 "0","#prepare graphs"

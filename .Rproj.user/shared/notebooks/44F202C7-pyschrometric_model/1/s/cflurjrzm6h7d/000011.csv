@@ -1,5 +1,0 @@
-"0","##### summarized yearly data for exponential moving average"
-"0","moving_average <- climate_cleaned %>% "
-"0","                  group_by(year) %>% "
-"0","                  summarize(temp= mean(t.1), rh= mean(rh.1), wind=mean(u.1), precip=sum(p.1),"
-"0","                        rain_ratio= mean(phaseCorrectRainRatio)) %>% ungroup()"
