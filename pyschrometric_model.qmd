@@ -193,6 +193,10 @@ grid.arrange(make_graph( type = geom_line, variable= temp,    weight = temp_ema,
              make_graph( type = geom_step, variable= rh,     weight = rh_ema,     xlab="", ylab =  "Relative Humidity (%)", mkmodel= mkmodel_rh),
              make_graph( type = geom_bar,  variable =smooth_precip, weight = precip_ema, xlab="", ylab = expression("Precipitation (mm)"), mkmodel=mkmodel_smoother))
 dev.off()
+
+png("plots/temp.tiff",  height = 5, width = 7, units = "in", res = 300)
+make_graph( type = geom_line, variable= temp,    weight = temp_ema,   xlab="", ylab = "Temperature °C",  mkmodel= mkmodel_temp)
+dev.off()
 ```
 
 ```{r}
@@ -452,7 +456,7 @@ dev.off()
 lines_graph_maker <- function(calculate, column, ylabel, legend){
   monthly_data <- data %>%
     group_by(year, month) %>%
-    summarize(mean = calculate({{column}}))
+    summarize(mean = calculate({{column}}, na.rm = TRUE))
 
   monthly_data$year <- factor(monthly_data$year)
   color_palette <- colorRampPalette(c("#0165fc", "yellow", "red"))(length(unique(monthly_data$year)))
@@ -481,10 +485,15 @@ png("plots/4plots_combined.tiff", height = 8, width = 8, units = "in", res = 300
 grid.arrange(plot1, plot2, plot3, plot4, plot5)
 dev.off()
 
-# png("plots/oneplotwithlegend.tiff", height = 7, width = 7, units = "in", res = 300)
-# lines_graph_maker(sum,  p.1,  "Precipitation (m/s)", legend="right")
-# dev.off()
-#
+png("plots/oneplotwithlegend.tiff", height = 7, width = 7, units = "in", res = 300)
+lines_graph_maker(sum,  p.1,  "Precipitation (mm/s)", legend="right")
+dev.off()
+
+
+png("plots/phase_trend_line_graph.tiff", height = 5, width = 8, units = "in", res = 300)
+lines_graph_maker(sum,  phaseCorrectRainRatio,  "Daily Additive Rainfall ratio", legend="right")
+dev.off()
+
 ```
 
 

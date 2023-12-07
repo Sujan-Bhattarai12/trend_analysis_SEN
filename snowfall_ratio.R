@@ -1,5 +1,6 @@
-# Name..................Sujan Bhattarai
-# Project............... partition precipitation into rain-snow based on psychrometric model
+# Name ---------------Sujan Bhattarai
+# Project Name---------use logistic regression to calculate probability for precipitaion
+                     #phase 
 # Date................. May 4, 2023
 #::::::::::::::::::::::::::::::::::::::::::::
 
