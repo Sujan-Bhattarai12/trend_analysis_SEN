@@ -1,8 +1,7 @@
 
 # Using Multivariate logistic regression on climate data to detect climate change
-# Project Background
 
-## Highlights
+## Highlights of the Findings
 
 - Langtang region receives 57-78% of annual total precipitation as rain and (22-43%) as snow. June, July, and August receive most precipitation as rain.
 - Rain-snow transition temperature occurs at 1.78 °C.
