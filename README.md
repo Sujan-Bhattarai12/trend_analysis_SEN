@@ -1,5 +1,5 @@
 
-#### title: "Using Multivariate logistic regression on climate data to detect climate change"
+#"Using Multivariate logistic regression on climate data to detect climate change"
 # Project Background
 
 ## Highlights
