@@ -1,10 +1,5 @@
----
-title: "Using Multivariate logistic regression on climate data to detect climate change"
-author: "Sujan"
-date: "2024-07-07"
-output: html_document
----
 
+#### title: "Using Multivariate logistic regression on climate data to detect climate change"
 # Project Background
 
 ## Highlights
