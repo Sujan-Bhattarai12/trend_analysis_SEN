@@ -67,21 +67,4 @@ Logistic regression models the mathematic relationships between explanatory vari
 
 Logistic regression is often used in estimating phase point change, where the log odds are fitted into the probability equation. In this study, the logistic model is fitted for temperature and rainfall ratio, and the half-point temperature for the Langtang basin is identified.
 
-## References
 
-1. Bhattarai, et al., 2020
-2. Dahri, et al., 2021
-3. Harder & Pomeroy, 2013
-4. Khan, et al., 2017
-5. Kendall, 1975
-6. Killick, et al., 2012
-7. Pradhananga, et al., 2021
-8. Sen, 1974
-9. Shook, 2021
-10. Stewart, 1992
-11. Weedon, et al., 2011; 2014
-12. Wambui, et al., 2015
-13. Wijngaard, et al., 2003
-14. Ogungbenro & Morakinyo, 2014
-15. Shahid, et al., 2018
-16. Wang, et al., 2019
