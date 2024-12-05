@@ -1,5 +1,6 @@
 
 # Using Multivariate logistic regression on climate data to detect climate change
+(note: Please convert all Latex based mathematical equations with text editor)
 
 ## Highlights of the Findings
 
