@@ -1,5 +1,6 @@
-# this model cacluates the hydrometeor temperature accounting t.1 and rh.1
-# which is used in logistic regression mapping
+# This function calculates the hydrometeor temperature (Ti) based on t.1 and rh.1
+# and is used in logistic regression mapping.
+
 compute_Ti <- function(df) {
   
   # Compute saturated vapor pressure (Tetens formula)
@@ -12,20 +13,21 @@ compute_Ti <- function(df) {
     return(saturated_vapor_pressure(T) * (RH / 100))
   }
   
-  # Function to compute hydrometeor temperature (Ti) iteratively
+  # Function to compute hydrometeor temperature (Ti) directly
   compute_Ti <- function(Ta, RH) {
     L <- 2.5e6  # Latent heat of vaporization (J/kg)
     lt <- 0.024  # Thermal conductivity of air (W/m·K)
     D <- 2.5e-5  # Diffusivity of water vapor in air (m^2/s)
     
-    Ti <- Ta  # Initial guess (starting with air temperature)
-    for (i in 1:10) {  # Iterative approach
-      r_Ta <- actual_vapor_pressure(Ta, RH) / (461.5 * (Ta + 273.15))  # Water vapor density
-      r_sat_Ti <- saturated_vapor_pressure(Ti) / (461.5 * (Ti + 273.15))  # Saturated vapor density at Ti
-      
-      # Update Ti using the Pomeroy equation
-      Ti_new <- round(Ta + (D / lt) * L * (r_Ta - r_sat_Ti), 3)
-    }
+    # Compute water vapor density at Ta
+    r_Ta <- actual_vapor_pressure(Ta, RH) / (461.5 * (Ta + 273.15)) 
+    
+    # Compute saturated vapor density at Ti (assuming Ti ≈ Ta initially)
+    r_sat_Ti <- saturated_vapor_pressure(Ta) / (461.5 * (Ta + 273.15)) 
+    
+    # Compute Ti directly using the Pomeroy equation
+    Ti <- r(Ta + (D / lt) * L * (r_Ta - r_sat_Ti), 2)
+    
     return(Ti)
   }
   
@@ -34,3 +36,4 @@ compute_Ti <- function(df) {
   
   return(df)  # Return updated dataframe
 }
+
