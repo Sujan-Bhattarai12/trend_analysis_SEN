@@ -1,7 +1,9 @@
 ---
 title: "logistic_regression"
 author: "Sujan Bhattarai"
-format: html
+format: 
+  pdf: 
+    documentclass: article
 editor: visual
 ---
 
@@ -17,7 +19,6 @@ to install CRHMr package for updated R, you first need these packages install.pa
 #load all required packages that will be used for analysis
 library(CRHMr)
 library(lubridate)
-library(ggplot2)
 library(dplyr)
 library(trend)
 library(changepoint)
@@ -30,6 +31,12 @@ library(car)
 library(gridExtra)
 library(xts)
 library(here)
+```
+
+```{r}
+#source functions
+set.seed(123)
+source("compute_Ti.R")
 ```
 
 ```{r}
@@ -57,6 +64,12 @@ climate_data     <- subset(climate_data, select = c(datetime, t.1, rh.1, u.1, p.
 #phaseCorrect function partitions based on the temp
 climate_partitioned <- phaseCorrect(climate_data, Tcol = 1, RHcol = 2, Ucol = 3, Pcol = 4,
                             shield = 0, quiet = F) 
+```
+
+```{r}
+#create a model to calculate Ti(hydrometeor temperature) based on the above variables
+compute_Ti(climate_partitioned)
+
 ```
 
 ```{r}
@@ -141,8 +154,6 @@ sens.slope(moving_average$rain_ratio_ema)
 pettitt.test(moving_average$rain_ratio_ema)
 ```
 
-
-
 ```{r}
 #create slope values for sen's slopem 
 # this value will be used in next plot
@@ -184,7 +195,6 @@ make_graph <- function(type, variable, weight, xlab, ylab, mkmodel, legend.posit
   return(plot)
 }
 ```
-
 
 ```{r}
 png("plots/trend_test.tiff",  height = 5, width = 7, units = "in", res = 300)
@@ -254,7 +264,6 @@ x <- cpt.meanvar(annual_Night$night_rain_ratio_ema, method="AMOC", minseglen = 1
 param.est(x)
 ```
 
-
 ```{r}
 # ggplot does not have readymade function for sens slope.. so manual model is created for day and night
 # so that it can be used in visualization part
@@ -288,7 +297,6 @@ ggplot(annual_mean, aes(year, annual_average, color= period))+
 
 ggsave("plots/day-and-night.tiff", height=5, width=4) # saves the previously created ggplot graphics in high quality
 ```
-
 
 ```{r}
 # for august and for all other months
@@ -338,7 +346,6 @@ monthwise_test("Dec", "Night")
 #then creating phase column as factor, which is enforced to logistic model
 ```
 
-
 ```{r}
 #### data for logistic maping
 summary_log <- climate_cleaned %>% 
@@ -354,7 +361,7 @@ summary_log <- climate_cleaned %>%
 #summary_log$temp_1 <-  rnorm(9546, 0, 0.01) + summary_log$temp
 ##define the model
 
-log_regression <- glm(phase ~  temp + rh + wind, family = "binomial", data= summary_log)
+log_regression <- glm(phase ~  Ti + rh + wind, family = "binomial", data= summary_log)
 summary(log_regression)
 vif(log_regression)
 
@@ -370,7 +377,6 @@ ggplot(summary_log, aes(temp, rain_ratio))+
 
 ggsave("plots/logistic.png", width = 7, height= 7, type="cairo", dpi= 300)
 ```
-
 
 ```{r}
 ## visual representation of rain-ratio with rall variables
@@ -388,7 +394,6 @@ visual_relation(wind)
 visual_relation(temp)
 visual_relation(pp)
 ```
-
 
 ```{r}
 # creating graph for sample year 2000
@@ -410,7 +415,6 @@ filter(year != 2019)
 
 ```
 
-
 ```{r}
 time_series <-  data %>%
                 group_by(year, month, day) %>%
@@ -431,7 +435,6 @@ axis(side = 4, at = pretty(ts2_2000$phaseCorrectSnow.sum), col = 4, lwd = 1.6)
 dev.off()
 ```
 
-
 ```{r}
 ############# plot for the sample year
 dev.new()
@@ -449,7 +452,6 @@ addLegend(
   lwd = 1.5)
 dev.off()
 ```
-
 
 ```{r}
 # month_wise grid plot with 40 lines
@@ -495,7 +497,6 @@ lines_graph_maker(sum,  phaseCorrectRainRatio,  "Daily Additive Rainfall ratio",
 dev.off()
 
 ```
-
 
 ```{r}
 # 
