@@ -42,3 +42,64 @@
 2025-03-10_12:44:04 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
 2025-03-10_12:44:08 changeEAtoRH dataframe: climate_data 
 2025-03-10_12:44:12 phaseCorrect dataframe:climate_data 
+2025-03-10_14:04:03 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_14:04:07 changeEAtoRH dataframe: climate_data 
+2025-03-10_14:04:12 phaseCorrect dataframe:climate_data 
+2025-03-10_14:11:30 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_14:11:34 changeEAtoRH dataframe: climate_data 
+2025-03-10_14:11:39 phaseCorrect dataframe:climate_data 
+2025-03-10_14:17:00 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_14:17:06 changeEAtoRH dataframe: climate_data 
+2025-03-10_14:17:15 phaseCorrect dataframe:climate_data 
+2025-03-10_14:18:47 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_14:18:51 changeEAtoRH dataframe: climate_data 
+2025-03-10_14:18:55 phaseCorrect dataframe:climate_data 
+2025-03-10_14:43:09 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_14:43:12 changeEAtoRH dataframe: climate_data 
+2025-03-10_14:43:18 phaseCorrect dataframe:climate_data 
+2025-03-10_16:27:28 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_16:27:32 changeEAtoRH dataframe: climate_data 
+2025-03-10_16:27:36 phaseCorrect dataframe:climate_data 
+2025-03-10_16:28:08 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_16:28:12 changeEAtoRH dataframe: climate_data 
+2025-03-10_16:28:16 phaseCorrect dataframe:climate_data 
+2025-03-10_16:29:55 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_16:29:58 changeEAtoRH dataframe: climate_data 
+2025-03-10_16:30:02 phaseCorrect dataframe:climate_data 
+2025-03-10_19:03:45 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_19:03:48 changeEAtoRH dataframe: climate_data 
+2025-03-10_19:03:53 phaseCorrect dataframe:climate_data 
+2025-03-10_21:29:34 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:29:37 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:29:42 phaseCorrect dataframe:climate_data 
+2025-03-10_21:36:41 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:36:46 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:36:50 phaseCorrect dataframe:climate_data 
+2025-03-10_21:37:46 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:37:50 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:37:55 phaseCorrect dataframe:climate_data 
+2025-03-10_21:43:47 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:43:51 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:43:55 phaseCorrect dataframe:climate_data 
+2025-03-10_21:46:49 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:46:52 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:46:57 phaseCorrect dataframe:climate_data 
+2025-03-10_21:47:08 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:47:11 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:47:16 phaseCorrect dataframe:climate_data 
+2025-03-10_21:49:03 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:49:07 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:49:11 phaseCorrect dataframe:climate_data 
+2025-03-10_21:50:54 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:50:58 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:51:03 phaseCorrect dataframe:climate_data 
+2025-03-10_21:51:32 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-10_21:51:36 changeEAtoRH dataframe: climate_data 
+2025-03-10_21:51:40 phaseCorrect dataframe:climate_data 
+2025-03-11_11:34:58 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-11_13:57:55 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-11_13:57:59 changeEAtoRH dataframe: climate_data 
+2025-03-11_13:58:04 phaseCorrect dataframe:climate_data 
+2025-03-11_13:59:13 readObsFile obsFile:/Users/sujanbhattarai/Desktop/paras-daiwork/PhaseChange/data/climate_data.obs datetype:discrete timezone:MST 
+2025-03-11_13:59:16 changeEAtoRH dataframe: climate_data 
+2025-03-11_13:59:22 phaseCorrect dataframe:climate_data 

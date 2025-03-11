@@ -26,7 +26,7 @@ compute_Ti <- function(df) {
     r_sat_Ti <- saturated_vapor_pressure(Ta) / (461.5 * (Ta + 273.15)) 
     
     # Compute Ti directly using the Pomeroy equation
-    Ti <- r(Ta + (D / lt) * L * (r_Ta - r_sat_Ti), 2)
+    Ti <- round(Ta + (D / lt) * L * (r_Ta - r_sat_Ti), 2)
     
     return(Ti)
   }

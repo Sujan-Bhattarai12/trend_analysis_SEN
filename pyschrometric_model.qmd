@@ -46,8 +46,9 @@ plot_path = file.path(here('plots'))
 
 ```{r}
 #constuct file path using here package
-climate_data <- here("data", "climate_data.obs")
-climate_data <- readObsFile(climate_data, timezone = 'MST', quiet = F)
+climate_data_wfdei <- here("data", "climate_data.obs")
+cimate_data_era <- here("your_dataset_fixed.obs")
+climate_data <- readObsFile(cimate_data_era, timezone = 'MST', quiet = F)
 ```
 
 ```{r}
@@ -68,14 +69,16 @@ climate_partitioned <- phaseCorrect(climate_data, Tcol = 1, RHcol = 2, Ucol = 3,
 
 ```{r}
 #create a model to calculate Ti(hydrometeor temperature) based on the above variables
-compute_Ti(climate_partitioned)
+source(here("compute_Ti.R"))
+climate_partitioned= compute_Ti(climate_partitioned)
 
 ```
 
 ```{r}
 #make new columns for months and days, add seasons to make it easy for  analysis and visualizations 
 climate_cleaned <- climate_partitioned %>% 
-        mutate(phaseCorrectRainRatio= round(phaseCorrectRainRatio, digits=2),
+        filter(rh.1 > 40) %>% 
+        mutate(phaseCorrectRainRatio= round(phaseCorrectRainRatio, digits=5),
                year= year(datetime),
                month= month(datetime, label = TRUE),
                day= day(datetime),
@@ -90,6 +93,7 @@ climate_cleaned <- climate_partitioned %>%
 ```{r}
 ##duplicate copy, the original data is often required in later stage
 clone_copy <- climate_partitioned %>% 
+        filter(rh.1 > 40) %>% 
         mutate(phaseCorrectRainRatio= round(phaseCorrectRainRatio, digits=2),
                year= year(datetime),
                month= month(datetime, label = TRUE),
@@ -264,6 +268,8 @@ x <- cpt.meanvar(annual_Night$night_rain_ratio_ema, method="AMOC", minseglen = 1
 param.est(x)
 ```
 
+\
+
 ```{r}
 # ggplot does not have readymade function for sens slope.. so manual model is created for day and night
 # so that it can be used in visualization part
@@ -350,7 +356,7 @@ monthwise_test("Dec", "Night")
 #### data for logistic maping
 summary_log <- climate_cleaned %>% 
   group_by(year, month, day) %>% 
-  summarize(temp= mean(t.1), 
+  summarize(temp= mean(Ti), 
             rh= mean(rh.1),
             wind=mean(u.1), 
             pp=mean(p.1),
@@ -361,20 +367,54 @@ summary_log <- climate_cleaned %>%
 #summary_log$temp_1 <-  rnorm(9546, 0, 0.01) + summary_log$temp
 ##define the model
 
-log_regression <- glm(phase ~  Ti + rh + wind, family = "binomial", data= summary_log)
+log_regression <- glm(phase ~  temp + rh + wind, family = "binomial", data= summary_log)
 summary(log_regression)
 vif(log_regression)
 
 # plotting logistic graph between temp and rainfall fraction 
-ggplot(summary_log, aes(temp, rain_ratio))+
-  geom_point(aes(color= season), alpha=0.5)+
-  theme_bw()+ ylab("rainfall ratio")+ 
-  scale_y_continuous(breaks = seq(0.00, 1.00, by = 0.10))+
-  geom_jitter(width = 0.01, alpha=0.1)+
-  geom_smooth(method= 'glm',  method.args=list(family="binomial"))+
-  theme(axis.title = element_text(size = 14))+ xlab("Temperature °C")+ ylab("Logistic probability")+
-  theme(legend.text=element_text(size= 12))
+ggplot(summary_log, aes(temp, rain_ratio)) +
+  geom_point(aes(size = ifelse(rh >= 80, "High", "Low")), alpha = 0.5) + # Categorizing RH
+  theme_bw() + 
+  ylab("Rainfall Ratio") + 
+  scale_y_continuous(breaks = seq(0.00, 1.00, by = 0.10)) +
+  geom_jitter(width = 0.01, alpha = 0.1) +
+  geom_smooth(method = 'glm', method.args = list(family = "binomial")) +
+  theme(axis.title = element_text(size = 14)) + 
+  xlab("Temperature (°C)") + 
+  ylab("Logistic Probability") +
+  theme(legend.text = element_text(size = 12))
+```
 
+```{r}
+# Load necessary libraries
+#tesiting mood
+
+set.seed(123)  # Ensuring reproducibility
+sample_data <- summary_log %>% sample_frac(0.1)
+
+# Convert 'phase' to numeric (0 = Rain, 1 = Snow)
+sample_data <- sample_data %>%
+  mutate(phase = as.numeric(as.character(phase)),  # Ensure phase is numeric
+         wind_category = ifelse(wind >= median(wind, na.rm = TRUE), "High", "Low")) # Categorize wind speed
+
+# Plot temperature vs. phase with logistic regression
+ggplot(sample_data, aes(x = temp, y = phase, color = as.factor(phase))) +
+  geom_point(aes(shape = wind_category, size = ifelse(rh >= 80, "High", "Low")), alpha = 0.5) +  # Size by RH, shape by Wind
+  theme_bw() + 
+  scale_y_continuous(breaks = c(0, 1), labels = c("Rain", "Snow")) +  # Ensure correct phase labels
+  geom_jitter(width = 0, height = 0.2, alpha = 0.3) +  # Adds jitter to separate points
+  geom_smooth(method = "glm", method.args = list(family = binomial()), se = TRUE, color = "deeppink") +  # Logistic regression line
+  theme(axis.title = element_text(size = 14)) + 
+  xlab("Temperature (°C)") + 
+  ylab("Precipitation Phase (Probability of Snow)") +
+  theme(legend.text = element_text(size = 12)) +
+  scale_size_manual(values = c("Low" = 2, "High" = 5), name = "Humidity Level") +  # Adjusting point sizes
+  scale_shape_manual(values = c("Low" = 16, "High" = 17), name = "Wind Speed") +  # Different shapes for wind levels
+  scale_color_manual(values = c("0" = "red", "1" = "deeppink"), name = "Precipitation Phase", labels = c("Rain", "Snow"))  # Rename legend
+
+```
+
+```{r}
 ggsave("plots/logistic.png", width = 7, height= 7, type="cairo", dpi= 300)
 ```
 
@@ -390,9 +430,7 @@ visual_relation <- function(variable){
 }
 
 visual_relation(rh)
-visual_relation(wind)
 visual_relation(temp)
-visual_relation(pp)
 ```
 
 ```{r}
@@ -412,95 +450,117 @@ data <- clone_copy %>%
                           ifelse( month == "Mar" | month == "Apr" | month == "May", "pre_monsoon",
                                   ifelse(month == "Oct" | month == "Nov", "post_monsoon", "monsoon")))) %>% 
 filter(year != 2019)
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(tidyr)
+
+# Convert datetime column to POSIXct format (if not already)
+df <- data %>%
+  mutate(datetime = as.POSIXct(datetime, format="%Y-%m-%d %H:%M:%S"),
+         Year = year(datetime),    
+         Month = month(datetime, label = TRUE, abbr = TRUE))  # Extract Month as a factor
+
+# Step 1: Aggregate by Year-Month (Summing values per month)
+df_monthly <- df %>%
+  group_by(Year, Month) %>%
+  summarise(
+    Rain_MonthlySum = sum(phaseCorrectRain, na.rm = TRUE),
+    Snow_MonthlySum = sum(phaseCorrectSnow, na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+# Step 2: Aggregate by Year (Summarizing min, max, and mean)
+df_summary <- df_monthly %>%
+  group_by(Year) %>%
+  summarise(
+    Rain_Mean = mean(Rain_MonthlySum, na.rm = TRUE),
+    Rain_Min  = min(Rain_MonthlySum, na.rm = TRUE),
+    Rain_Max  = max(Rain_MonthlySum, na.rm = TRUE),
+    Snow_Mean = mean(Snow_MonthlySum, na.rm = TRUE),
+    Snow_Min  = min(Snow_MonthlySum, na.rm = TRUE),
+    Snow_Max  = max(Snow_MonthlySum, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = c(Rain_Mean, Snow_Mean), 
+               names_to = "PrecipType", values_to = "Mean") %>%
+  mutate(
+    PrecipType = ifelse(PrecipType == "Rain_Mean", "Rainfall", "Snowfall"),
+    Min = ifelse(PrecipType == "Rainfall", Rain_Min, Snow_Min),
+    Max = ifelse(PrecipType == "Rainfall", Rain_Max, Snow_Max)
+  ) %>%
+  select(Year, PrecipType, Mean, Min, Max)
+
+# Create a time series plot with enhanced readability
+p <- ggplot(df_summary, aes(x = Year, y = Mean, group = PrecipType, color = PrecipType)) +
+  geom_line(size = 1.2) +  # Make trend line thicker
+  geom_ribbon(aes(ymin = Min, ymax = Max, fill = PrecipType), alpha = 0.15) +  # Transparent shaded region
+  facet_wrap(~PrecipType, nrow = 2) +  # Arrange facets in rows
+  scale_color_manual(values = c("Rainfall" = "#1f78b4", "Snowfall" = "#b2182b")) +  
+  scale_fill_manual(values = c("Rainfall" = "#1f78b4", "Snowfall" = "#b2182b")) +
+  scale_y_continuous(limits = c(0, max(df_summary$Max, na.rm = TRUE))) +  # Same y-axis scale
+  theme_bw(base_size = 14) +  
+  theme(panel.grid.major.x = element_line(color = "grey80", linetype = "dashed")) +  # Vertical gridlines
+  labs(
+    title = "Annual Rainfall & Snowfall Trends with Variability",
+    subtitle = "Mean precipitation with shaded min-max range",
+    x = "Year",
+    y = "Precipitation (mm)",
+    color = "Precipitation Type",
+    fill = "Precipitation Type"
+  )
+
+# Save the plot as a high-resolution PNG (300 DPI)
+ggsave(filename = "plots/rainfall_snowfall_trends.png", plot = p, 
+       width = 12, height = 6, units = "in", dpi = 300)
+
 
 ```
 
 ```{r}
-time_series <-  data %>%
-                group_by(year, month, day) %>%
-                summarize(rain=sum(phaseCorrectRain), snow= sum(phaseCorrectSnow), temp= mean(t.1))
-
-ts2 <- xts(time_series[4:5], order.by = datetime)
-ts2_2000 <- ts2["2000"]
-
-dev.new()
-png( "plots/rain and snow.tiff", height = 4, width = 10, units = "in", res = 300)
-plot( ts2$rain, lwd = 0.5, xlim=c(1979, 2018), col = "#454545", main = NA,
-      yaxis.right = F, ylab = "Precipitation(mm/day)", grid.col=NA, cex=0.7)
-lines(ts2$snow, col = 4, lwd = 0.5)
-addLegend(legend.loc = "topright", legend.names = c("rainfall", "snowfall"), col = c("#454545", 4),
-          lty = 1, lwd = 1.5)
-
-axis(side = 4, at = pretty(ts2_2000$phaseCorrectSnow.sum), col = 4, lwd = 1.6)
-dev.off()
+# time_series <-  data %>%
+#                 group_by(year, month, day) %>%
+#                 summarize(rain=sum(phaseCorrectRain), snow= sum(phaseCorrectSnow), temp= mean(t.1))
+# 
+# ts2 <- xts(time_series[4:5], order.by = datetime)
+# ts2_2000 <- ts2["2000"]
+# 
+# dev.new()
+# png( "plots/rain and snow.tiff", height = 4, width = 10, units = "in", res = 300)
+# plot( ts2$rain, lwd = 0.5, xlim=c(1979, 2018), col = "#454545", main = NA,
+#       yaxis.right = F, ylab = "Precipitation(mm/day)", grid.col=NA, cex=0.7)
+# lines(ts2$snow, col = 4, lwd = 0.5)
+# addLegend(legend.loc = "topright", legend.names = c("rainfall", "snowfall"), col = c("#454545", 4),
+#           lty = 1, lwd = 1.5)
+# 
+# axis(side = 4, at = pretty(ts2_2000$phaseCorrectSnow.sum), col = 4, lwd = 1.6)
+# dev.off()
 ```
 
 ```{r}
 ############# plot for the sample year
-dev.new()
-png("plots/rain and snow 2000.tiff", height = 4, width = 10, units = "in", res = 300)
-
-plot(ts2_2000$rain, lwd = 1, xlim(1979, 2018), col = "#454545",
-     main = NA, yaxis.right = F, ylab = "Precipitation(mm/day)", cex=0.7,
-     grid.col=NA)
-lines(ts2_2000$snow, col = 4,lwd = 1)
-addLegend(
-  legend.loc = "topright",
-  legend.names = c("rainfall", "snowfall"),
-  col = c("#454545", 4),
-  lty = 1,
-  lwd = 1.5)
-dev.off()
-```
-
-```{r}
-# month_wise grid plot with 40 lines
-lines_graph_maker <- function(calculate, column, ylabel, legend){
-  monthly_data <- data %>%
-    group_by(year, month) %>%
-    summarize(mean = calculate({{column}}, na.rm = TRUE))
-
-  monthly_data$year <- factor(monthly_data$year)
-  color_palette <- colorRampPalette(c("#0165fc", "yellow", "red"))(length(unique(monthly_data$year)))
-
-  ggplot(monthly_data, aes(month, mean, group = year, color = year)) +
-    geom_line(size = ifelse(between(as.integer(monthly_data$year), 1, 1) |
-                              between(as.integer(monthly_data$year), 40, 40), 0.7, 0.2),
-              alpha = 1) +
-    scale_color_manual(values = color_palette) +
-    # geom_line(data = monthly_data[1, ], aes(group = year, color = year), size = 2) +
-    # geom_line(data = monthly_data[length(monthly_data$year), ], aes(group = year, color = year), size = 2) +
-    theme_bw() +
-    theme(axis.title = element_text(size = 10)) +
-    ylab(ylabel) +
-    xlab("") +
-    theme(legend.position = legend, legend.text = element_text(size = 12))
-}
-
-plot1  <- lines_graph_maker(max,  t.1,  "Maximum Daily Temperature °C", legend="none")
-plot2  <- lines_graph_maker(min,  t.1,  "Minimum Daily Temperature °C", legend="none")
-plot3  <- lines_graph_maker(mean, rh.1,  "Relative Humidity (%)", legend="none")
-plot4  <- lines_graph_maker(mean, u.1,  expression("Wind (ms"^-1*")"), legend="none")
-plot5  <- lines_graph_maker(sum,  p.1,  "Precipitation (mm)", legend="none")
-
-png("plots/4plots_combined.tiff", height = 8, width = 8, units = "in", res = 300)
-grid.arrange(plot1, plot2, plot3, plot4, plot5)
-dev.off()
-
-png("plots/oneplotwithlegend.tiff", height = 7, width = 7, units = "in", res = 300)
-lines_graph_maker(sum,  p.1,  "Precipitation (mm/s)", legend="right")
-dev.off()
-
-
-png("plots/phase_trend_line_graph.tiff", height = 5, width = 8, units = "in", res = 300)
-lines_graph_maker(sum,  phaseCorrectRainRatio,  "Daily Additive Rainfall ratio", legend="right")
-dev.off()
-
+# dev.new()
+# png("plots/rain and snow 2000.tiff", height = 4, width = 10, units = "in", res = 300)
+# 
+# plot(ts2_2000$rain, lwd = 1, xlim(1979, 2018), col = "#454545",
+#      main = NA, yaxis.right = F, ylab = "Precipitation(mm/day)", cex=0.7,
+#      grid.col=NA)
+# lines(ts2_2000$snow, col = 4,lwd = 1)
+# addLegend(
+#   legend.loc = "topright",
+#   legend.names = c("rainfall", "snowfall"),
+#   col = c("#454545", 4),
+#   lty = 1,
+#   lwd = 1.5)
+# dev.off()
 ```
 
 ```{r}
 # 
-# ####seasonal mathematical measure 
+
 # 
 # seasonal <- function(x, y) {
 #   filtered_data <- clone_copy  %>% 
@@ -531,5 +591,51 @@ dev.off()
 #   summarize(mean = mean(ratio),
 #             lower_ci = quantile(ratio, probs = 0.025),
 #             upper_ci = quantile(ratio, probs = 0.975))
+
+```
+
+```{r}
+# month_wise grid plot with 40 lines
+lines_graph_maker <- function(calculate, column, ylabel, legend){
+  monthly_data <- data %>%
+    group_by(year, month) %>%
+    summarize(mean = calculate({{column}}, na.rm = TRUE))
+
+  monthly_data$year <- factor(monthly_data$year)
+  color_palette <- colorRampPalette(c("#0165fc", "yellow", "red"))(length(unique (monthly_data$year)))
+
+    ggplot(monthly_data, aes(month, mean, group = year, color = year)) +
+    geom_line(size = ifelse(between(as.integer(monthly_data$year), 1, 1) |
+                              between(as.integer(monthly_data$year), 40, 40), 0.7, 0.2),
+              alpha = 1) +
+    scale_color_manual(values = color_palette) +
+    # geom_line(data = monthly_data[1, ], aes(group = year, color = year), size = 2) +
+    # geom_line(data = monthly_data[length(monthly_data$year), ], aes(group = year, 
+    # color =    year), size = 2) +
+    theme_bw() +
+    theme(axis.title = element_text(size = 10)) +
+    ylab(ylabel) +
+    xlab("") +
+    theme(legend.position = legend, legend.text = element_text(size = 12))
+}
+
+plot1  <- lines_graph_maker(max,  t.1,  "Maximum Daily Temperature °C", legend="none")
+plot2  <- lines_graph_maker(min,  t.1,  "Minimum Daily Temperature °C", legend="none")
+plot3  <- lines_graph_maker(mean, rh.1,  "Relative Humidity (%)", legend="none")
+plot4  <- lines_graph_maker(mean, u.1,  expression("Wind (ms"^-1*")"), legend="none")
+plot5  <- lines_graph_maker(sum,  p.1,  "Precipitation (mm)", legend="none")
+
+png("plots/4plots_combined.tiff", height = 8, width = 8, units = "in", res = 300)
+grid.arrange(plot1, plot2, plot3, plot4, plot5)
+dev.off()
+
+png("plots/oneplotwithlegend.tiff", height = 7, width = 7, units = "in", res = 300)
+lines_graph_maker(sum,  p.1,  "Precipitation (mm/s)", legend="right")
+dev.off()
+
+
+png("plots/phase_trend_line_graph.tiff", height = 5, width = 8, units = "in", res = 300)
+lines_graph_maker(sum,  phaseCorrectRainRatio,  "Daily Additive Rainfall ratio", legend="right")
+dev.off()
 
 ```
